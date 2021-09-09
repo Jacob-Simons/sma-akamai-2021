@@ -1,0 +1,176 @@
+:root {
+  --main-bg-color: #c9c9c9;
+}
+$main-color:
+$secondary-color: white;
+$main-color: #333;
+$secondary-color: #2196f3;
+$width: 550px; // Change Me
+
+* {
+  box-sizing: border-box;
+}
+
+input[type='text']::-webkit-input-placeholder {
+    font-family: "Roboto", Times, serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+body {
+    background: var(--main-bg-color);
+    padding-top: 20px;
+}
+
+label:not(.title_label) {
+  //position: absolute;
+  //top: $width/15;
+  color: rgba(white, .5);
+  font: 400 $width/15 Roboto;
+  cursor: text;
+  display: inline-block;
+  font: Roboto;
+  margin: 3px;
+  transition: .25s ease;
+}
+
+input[type='text'].yminmax {
+    display: inline-block;
+    width: 100px;
+    margin: 2px;
+}
+
+label.title_label {
+    display: inline-block;
+    width: 250px;
+    font: Roboto;
+}
+
+//.dropdown {
+ //   background: transparent;
+  //  font: Roboto;
+//}
+
+select {
+  background-color: var(---main-bg-color);
+  font: Roboto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 6px 12px;
+}
+
+div.navbar {
+    background-color: #6495ED;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    font: Roboto;
+}
+
+a {
+    font: Roboto;
+    font-size: 20px;
+    font-weight: bold;
+    padding-right: 10px;
+    padding-left: 15px;
+}
+
+
+
+input[type='text']{
+  display: inline-block;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  width: 180px;
+  height: 20px;
+  margin-bottom: 10px;
+  //padding-top: $width/15;
+  //border: none;
+  //border-radius: 0; // For iOS
+  //border-bottom: 2px solid white;
+  color: black;
+  background: var(--main-bg-color);
+  font-size: 18px;
+  font: Roboto;
+  transition: .3s ease;
+  }
+
+  &:focus {
+    outline: none;
+    // border-bottom-color: $secondary-color;
+    ~label {
+      top: 0;
+      font: 700 $width/25 Roboto;
+      color: $secondary-color;
+    }
+
+
+    ~ .bar:before {
+    transform: translateX(0);
+    }
+  }
+
+h1{
+    font: "Roboto";
+    font-weight: bold;
+    font-size: 30px;
+}
+
+input[type="checkbox"] {
+    display: table-cell;
+    border: 1px solid #ccc;
+}
+
+  // Stop Chrome's hideous pale yellow background on auto-fill
+
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px $main-color inset;
+    -webkit-text-fill-color: white !important;
+    // border-bottom-color: rgba(white, .5);
+  }
+}
+
+
+::selection {background: rgba($secondary-color, .3);}
+
+#button_div input[type="submit"], [type="reset"], #button_div input[type="button"]{
+ display:inline-block;
+ padding:0.35em 1.2em;
+ //border:0.1em solid #FFFFFF;
+ margin:0 0.3em 0.3em 0;
+ border-radius:0.12em;
+ box-sizing: border-box;
+ text-decoration:none;
+ font-family:'Roboto',sans-serif;
+ font-weight:300;
+ color:#000000;
+ background-color:#b0aeae;
+ text-align:center;
+ transition: all 0.2s;
+}
+input[type="reset"]:hover{
+ color:#000000;
+ background-color: white;
+}
+input[type="submit"]:hover{
+ color:#000000;
+ background-color: white;
+}
+input[type="button"]:hover{
+ color:#000000;
+ background-color: white;
+}
+@media all and (max-width:30em){
+ input[type="reset"]{
+  display:block;
+  margin:0.4em auto;
+}
+input[type="submit"]{
+  display:block;
+  margin:0.4em auto;
+}
+input[type="button"]{
+  display:block;
+  margin:0.4em auto;
+}
+}

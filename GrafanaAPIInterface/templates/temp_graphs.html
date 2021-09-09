@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Grafana API Interface</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/temp_graphs_style.css') }}">
+    <link rel="icon" href="{{ logo }}">
+
+</head>
+<body>
+
+
+<div class="navbar">
+  <a href="home">Home</a>
+  <a href="create_dash">Create Dash</a>
+  <a href="delete_dash">Delete Dash</a>
+  <a href="temp_graphs">Temp Graphs</a>
+</div>
+    <h1>Engineering Database Plotter</h1>
+    <form method="POST">
+
+
+        <input id="graph_name" name="graph_name" type="text" placeholder="Graph Name">
+
+        <input type="text" id="search_key" name="search_key" placeholder="Search Key">
+
+        {{form.csrf_token}}
+        {{form.table}} <br>
+
+        <div id = "div0"></div>
+        <div id = "div1"></div>
+        <div id = "div2"></div>
+        <input type="text" id="time_from" name="time_from" placeholder="Time From">
+        <input type="text" id="time_to" name="time_to" placeholder="Time To"> <br>
+        <div id="button_div">
+        <input type="submit" id="submit_button" name="submit_button">
+        <input type="reset" id="reset_input" name="reset_input" value="Reset Inputs"/>
+        <input type="reset" id="clear_button" name="clear_button" value="Clear All Graphs"/></div>
+
+        <br>
+        <div id = "div3"></div>
+        <div id = "div4"></div>
+        <div id = "div5"></div>
+        <div id = "div6"></div>
+        <div id = "div7"></div>
+        <div id = "div8"></div>
+        <div id = "div9"></div>
+    </form>
+
+
+    <script>
+        let table_select = document.getElementById('table');
+        table_select.className = "dropdown";
+        var search_key = document.getElementById('search_key');
+        let clear_but = document.getElementById('clear_button');
+        var updated = false;
+
+        let reset_input_but = document.getElementById('reset_input');
+        let checkbox_label_list = [];
+        let update_checkbox_label_list = [];
+        let top_div = document.getElementById('div0');
+        let divs = [];
+
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var url_src = url.searchParams.get("src");
+        var url_uid = url.searchParams.get("uid");
+
+        if(url_src != null) {
+        var panel_id = url_src.substring(url_src.search("panelId=") + 8); }
+
+
+        let option_values = [];
+        let option_text = [];
+
+        //Creating arrays with all stored tables
+        for(var i = 0; i < table_select.length; i++)
+        {
+            option_values.push(table_select.options[i].value);
+            option_text.push(table_select.options[i].text);
+        }
+
+        //Deleting all table values
+        for (var i = table_select.length-1; i >= 0; i--) {
+                table_select.options[i] = null;
+        }
+
+        //Creating array with all divs
+        for(let i = 1; i < 10; i++)
+        {
+            divs.push(document.getElementById('div'.concat(String(i))));
+        }
+
+        var dash_uid = localStorage.getItem("uid");
+        if(url_uid != dash_uid && url_uid != null)
+        {
+            localStorage.setItem("uid", url_uid);
+            dash_uid = url_uid;
+        }
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "uid");
+        input.setAttribute("value", dash_uid);
+        divs[7].appendChild(input);
+
+        if(dash_uid != null)
+        {
+            var hyperlink = document.createElement('a');
+            hyperlink.setAttribute('href',"http://localhost:3000/d/".concat(dash_uid));
+            hyperlink.innerHTML = "Open Dashboard";
+            hyperlink.target = "blank";
+            document.getElementsByTagName('body')[0].appendChild(hyperlink);
+        }
+        var src_counter = localStorage.getItem("counter");
+
+        if(localStorage.getItem("checked_boxes0") != null)
+        {
+            var insert_graphs = document.createElement("input");
+            insert_graphs.type = "Reset";
+            insert_graphs.id = "insert_graphs_button";
+            insert_graphs.value = "Save Graphs to Dash";
+            document.getElementById('button_div').appendChild(insert_graphs);
+        }
+        let insert_graphs_but = document.getElementById('insert_graphs_button');
+
+
+
+        if(src_counter == null)
+        {
+            localStorage.setItem("counter", 0);
+            src_counter = localStorage.getItem("counter");
+        }
+
+        function create_checkboxes(table, is_update, target_loc, panel_id, checked_list) {
+            fetch('/col/' + table).then(function(response) {
+                response.json().then(function(data) {
+                    var counter = 0;
+                    for (let col of data.col) {
+                        if(col.col == "time") {
+                            continue;}
+                        // creating checkbox element
+                        var checkbox = document.createElement('input');
+
+                        if(is_update)
+                        {
+                            // Assigning the attributes
+                            // to created checkbox
+                            checkbox.type = "checkbox";
+                            checkbox.value = String(panel_id) + '/' + table + '/' + col.col;
+                            checkbox.name = 'update_boxes';
+                            //checkbox.id = counter;
+                            if(checked_list.search(table + col.col) != -1) {
+                                checkbox.checked = true;}
+                            checkbox.addEventListener('change', (event) => {
+                                updated = true;
+                                var checkbox = event.target || event.srcElement;
+                                var src_counter_append = localStorage.getItem(checkbox.value.substr(0, checkbox.value.search('/')));
+                                var src_label = localStorage.getItem("checked_boxes" + src_counter_append);
+
+                                if(checkbox.checked)
+                                {
+                                    src_label += checkbox.value.substr(checkbox.value.search('/') + 1);
+                                    src_label = src_label.replace('/', '');
+                                }
+                                else
+                                {
+                                    var tablecol = checkbox.value.substr(checkbox.value.search('/') + 1).replace('/', '');
+                                    src_label = src_label.replace(tablecol, "");
+                                }
+                                localStorage.setItem("checked_boxes" + src_counter_append, src_label);
+                            })
+
+                            // creating label for checkbox
+                            var label = document.createElement('label');
+                            label.name = 'update_boxes_label';
+                            label.innerHTML = col.col;
+                            update_checkbox_label_list.push(label);
+                        }
+                        else
+                        {
+                            // Assigning the attributes
+                            // to created checkbox
+                            checkbox.type = "checkbox";
+                            checkbox.value = String(table).concat(col.col);
+                            checkbox.name = 'boxes';
+                            //checkbox.id = counter;
+
+                            // creating label for checkbox
+                            var label = document.createElement('label');
+                            label.name = 'boxes_label';
+                            label.innerHTML = col.col;
+                            checkbox_label_list.push(label);
+                        }
+
+
+
+                        // appending the checkbox
+                        // and label to div
+                        target_loc.appendChild(checkbox);
+                        target_loc.appendChild(label);
+                        counter = counter + 1;
+                    }
+
+                });
+            });
+        };
+
+        function create_update_boxes(graph_table, graph_title, target_panel)
+        {
+            var holder_div = document.createElement('div');
+            divs[7].appendChild(holder_div);
+
+            while(graph_table != null && graph_table.length > 0 )
+            {
+                //creating table name label
+                var label = document.createElement('label');
+                label.name = 'update_boxes_label';
+                if(graph_title.search('/') != -1) {
+                    label.innerHTML = graph_title.substr(0, graph_title.search('/'));}
+                else {
+                    label.innerHTML = graph_title}
+                update_checkbox_label_list.push(label);
+
+                var checked_list = localStorage.getItem("checked_boxes".concat(String(i)));
+
+                var temp_div = document.createElement('div');
+                divs[7].appendChild(temp_div);
+                temp_div.appendChild(label);
+                if(graph_table.search('/') != -1) {
+                    var input_name = graph_table.substr(0, graph_table.search('/'));}
+                else {
+                    var input_name = graph_table;}
+                create_checkboxes(input_name, true, temp_div, target_panel, checked_list);
+
+
+
+                if(graph_table.search('/') != -1) {
+                    graph_table = graph_table.substr(graph_table.search('/') + 1);}
+                else {
+                    graph_table = "";}
+                graph_title = graph_title.substr(graph_title.search('/') + 1);
+            }
+        };
+
+        //Inserting all previously stored panels in local storage
+        var txt = document.createElement("textarea");
+        for(i = 0; i < src_counter; i++)
+        {
+            var key = "src".concat(i.toString());
+            var src = localStorage.getItem(key);
+            var iframe = document.createElement('iframe');
+            txt.innerHTML = src;
+            iframe.src = txt.value;
+            iframe.height = "400";
+            iframe.width = "600";
+            var curr_panel_id = txt.value.substring(txt.value.search("panelId=") + 8);
+            divs[7].appendChild(iframe);
+
+            linebreak = document.createElement("br");
+            divs[7].appendChild(linebreak);
+
+            var graph_title = localStorage.getItem("title".concat(i.toString()));
+            var graph_table = localStorage.getItem("table".concat(i.toString()));
+
+            create_update_boxes(graph_table, graph_title, curr_panel_id);
+            create_y_min_max(curr_panel_id);
+
+            //creating table name label
+            linebreak = document.createElement("br");
+            divs[7].appendChild(linebreak);
+        }
+
+
+        //Function for creating input boxes and labels for y min/max under each panel
+        function create_y_min_max(panel_id)
+        {
+            var ymin_input = document.createElement("input");
+            ymin_input.type = "text";
+            ymin_input.name = "ymin";
+            ymin_input.id = panel_id;
+            ymin_input.placeholder = "Y Min";
+            ymin_input.className = "yminmax";
+            divs[7].appendChild(ymin_input);
+
+            var ymax_input = document.createElement("input");
+            ymax_input.type = "text";
+            ymax_input.name = "ymax";
+            ymax_input.id = panel_id;
+            ymax_input.placeholder = "Y Max";
+            ymax_input.className = "yminmax";
+            divs[7].appendChild(ymax_input);
+
+            var ysubmit = document.createElement("input");
+            ysubmit.type = "submit";
+            divs[7].appendChild(ysubmit);
+
+            linebreak = document.createElement("br");
+            divs[7].appendChild(linebreak);
+        }
+
+        //If a new panel is passed it is saved into local storage here and then displayed in iframe
+        if(url_src != null && !url_src.endsWith("panelId=") && url_src != "" && url_src != localStorage.getItem("prev"))
+        {
+            localStorage.setItem("panel_id".concat(src_counter), panel_id);
+            localStorage.setItem(panel_id, src_counter);
+            localStorage.setItem("prev", url_src);
+            prev = url_src;
+            search = "src".concat(src_counter.toString());
+            localStorage.setItem(search, url_src);
+
+
+            iframe = document.createElement('iframe');
+
+            txt.innerHTML = url_src;
+            iframe.src = txt.value;
+            iframe.height = "400";
+            iframe.width = "600";
+
+            divs[7].appendChild(iframe);
+
+            linebreak = document.createElement("br");
+            divs[7].appendChild(linebreak);
+
+
+
+            var graph_title = localStorage.getItem("title".concat(src_counter.toString()));
+            var graph_table = localStorage.getItem("table".concat(src_counter.toString()));
+            var holder_div = document.createElement('div');
+            divs[7].appendChild(holder_div);
+            create_update_boxes(graph_table, graph_title, panel_id);
+
+            create_y_min_max(url_src.substring(url_src.search("panelId=") + 8));
+
+
+            src_counter++;
+            localStorage.setItem("counter", src_counter);
+        }
+
+        //Generates drop down menu options when search key is entered.
+        $('#search_key').bind('input', function() {
+            for (var i = table_select.length-1; i >= 0; i--) {
+                table_select.options[i] = null;
+            }
+
+            var total_entry = 0;
+            for(i = 0; i < option_values.length && total_entry < 20; i++)
+            {
+                if(option_text[i].toLowerCase().search(search_key.value.toLowerCase()) != -1)
+                {
+                    var new_option = document.createElement('option');
+                    new_option.text = option_text[i];
+                    new_option.value = option_values[i];
+                    table_select.add(new_option, 0);
+                    total_entry++;
+                }
+            }
+            table_select.value = null;
+        });
+
+    //Clear all Graphs Button deletes all local storage and refreshes page
+    clear_but.onclick = function()
+    {
+        if(insert_graphs_but != null) {
+            insert_graphs_but.parentNode.removeChild(insert_graphs_but); }
+        localStorage.clear();
+        window.location = window.location.pathname
+    };
+
+    if(insert_graphs_but != null)
+    {
+        insert_graphs_but.onclick = function()
+        {
+           location.replace('http://localhost:5000/temp_graphs/insert_graphs');
+           return false;
+        };
+    }
+
+    reset_input_but.onclick = function()
+    {
+        var checkboxes = document.getElementsByName('boxes');
+        var checkbox_labels = document.getElementsByName("boxes_label");
+
+        for(var i=checkboxes.length - 1;i>=0;i--) {
+            checkboxes[i].remove();
+        }
+
+        for(var i=checkbox_label_list.length - 1;i>=0;i--) {
+            checkbox_label_list[i].remove();
+        }
+
+        localStorage.removeItem("title".concat(src_counter.toString()));
+        localStorage.removeItem("table".concat(src_counter.toString()));
+
+    };
+
+    //Called when submit button is pressed filling out a hidden form which contains the panel id if any of the ymin/max
+    //fields are filled out
+    $("form").submit( function(eventObj) {
+
+        if(localStorage.getItem("panel_name".concat(src_counter)) == null){
+            localStorage.setItem("panel_name".concat(src_counter), document.getElementById('graph_name').value);}
+
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "updated");
+        input.setAttribute("value", updated);
+        divs[7].appendChild(input);
+        updated = false;
+
+        check_list = "";
+        var table_cols = document.getElementsByName("boxes");
+        for(var i = 0; i < table_cols.length; i++)
+        {
+            if(table_cols[i].checked) {
+                check_list += table_cols[i].value;}
+        }
+        localStorage.setItem("checked_boxes".concat(String(src_counter)), check_list);
+
+       var elements = document.getElementsByName("ymin");
+            if(elements != null) {
+             for (var i = 0, element; element = elements[i++];) {
+                    if (element.value != "")
+                    {
+                        var input = document.createElement("input");
+                        input.setAttribute("type", "hidden");
+                        input.setAttribute("name", "yminmax_panel_id");
+                        input.setAttribute("value", element.id);
+                        divs[7].appendChild(input);
+                        return true;
+                    }
+                }
+            }
+        });
+
+
+        //Generates the check boxes when a table is selected.  Checkboxes are labeled with their corresponding
+        //table and representative column.
+         table_select.onchange = function() {
+            table = table_select.value;
+            var title = document.createElement("Label");
+            checkbox_label_list.push(title);
+            title.className = "title_label";
+            title.innerHTML = String(table_select.options[table_select.selectedIndex].text);
+            var graph_title = localStorage.getItem("title".concat(src_counter.toString()));
+            var graph_table = localStorage.getItem("table".concat(src_counter.toString()));
+            if(graph_title == null){
+                graph_title = "";
+                graph_table = ""}
+            else {
+                graph_title += "/";;
+                graph_table += "/";}
+            graph_title += table_select.options[table_select.selectedIndex].text;
+            graph_table += table_select.options[table_select.selectedIndex].value;
+
+            localStorage.setItem("title".concat(src_counter.toString()), graph_title);
+            localStorage.setItem("table".concat(src_counter.toString()), graph_table);
+            var next_div = document.createElement('div');
+            top_div.appendChild(next_div);
+            next_div.appendChild(title);
+
+            create_checkboxes(table, false, next_div, 0);
+        };
+
+
+    </script>
+
+</body>
+</html>

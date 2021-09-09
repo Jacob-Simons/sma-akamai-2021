@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grafana API Interface</title>
+    <link rel="icon" href="{{ logo }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/insert_graphs_style.css') }}">
+</head>
+<body>
+<div class="navbar">
+  <a href="home">Home</a>
+  <a href="create_dash">Create Dash</a>
+  <a href="delete_dash">Delete Dash</a>
+  <a href="temp_graphs">Temp Graphs</a>
+</div>
+</body>
+<h1>SAO Engineering Database Plotter</h1>
+<p>
+    This tool uses Grafana to plot data from the engineering database
+</p>
+<a href="http://localhost:3000/?orgId=1" target="_blank"> Grafana Home</a>
+<p>
+    Grafana stores graphs in dashboards which can be saved and viewed any time <br><br>
+
+<h2>Create Dash</h2> - Creates permenant dashboards to be viewed later<br><br>
+
+<h2>Delete Dash</h2> - Deletes a permenant dashboard<br><br>
+
+<h2>Temp Graphs</h2> - Creates graphs in a temporary dashboard that will be deleted after
+                  24 hours.  Temporary graphs can be saved to permenant dashboards.
+</p>
+
+</html>

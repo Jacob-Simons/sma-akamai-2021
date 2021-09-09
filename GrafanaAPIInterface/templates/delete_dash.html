@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grafana API Interface</title>
+    <link rel="icon" href="{{ logo }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/insert_graphs_style.css') }}">
+
+</head>
+<body>
+    <h1>Delete Dashboard</h1>
+<div class="navbar">
+  <a href="home">Home</a>
+  <a href="create_dash">Create Dash</a>
+  <a href="delete_dash">Delete Dash</a>
+  <a href="temp_graphs">Temp Graphs</a>
+</div>
+<form method="POST">
+{{form.csrf_token}}
+{{form.table}}
+<div id="div"></div>
+<input type="submit" id="submit_button" name="submit_button">
+
+</form>
+<script>
+    //Creating arrays with all stored tables
+        let table_select = document.getElementById('table');
+        var option_values = [];
+        var option_text = [];
+        var div = document.getElementById('div');
+        for(var i = 0; i < table_select.length; i++)
+        {
+            option_values.push(table_select.options[i].value);
+            option_text.push(table_select.options[i].text);
+        }
+
+        //Deleting all table values
+        for (var i = table_select.length-1; i >= 0; i--) {
+                table_select.options[i] = null;
+        }
+        table_select.remove()
+
+        for(var i = 0; i < option_values.length; i++)
+        {
+            // creating checkbox element
+            var checkbox = document.createElement('input');
+
+            // Assigning the attributes
+            // to created checkbox
+            checkbox.type = "checkbox";
+            checkbox.name = 'boxes';
+            checkbox.value = option_values[i];
+            checkbox.id = i;
+
+            // creating label for checkbox
+            var label = document.createElement('label');
+
+            // assigning attributes for
+            // the created label tag
+            label.htmlFor = i;
+
+            // appending the created text to
+            // the created label tag
+            label.appendChild(document.createTextNode(option_text[i]));
+
+            // appending the checkbox
+            // and label to div
+            div.appendChild(checkbox);
+            div.appendChild(label);
+
+            linebreak = document.createElement("br");
+            div.appendChild(linebreak);
+        }
+</script>
+</body>
+</html>

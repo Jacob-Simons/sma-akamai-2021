@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grafana API Interface</title>
+    <link rel="icon" href="{{ logo }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/insert_graphs_style.css') }}">
+</head>
+
+<body>
+<form method="POST">
+Choose Graphs:
+<div id="div0"></div>
+Choose Dashboard to Insert:
+{{form.csrf_token}}
+{{form.table}}
+<input type="submit" id="submit_button" name="submit_button">
+
+</form>
+</body>
+<script>
+    var src_counter = localStorage.getItem("counter");
+    var div = document.getElementById("div0");
+
+    var input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "uid");
+    input.setAttribute("value", localStorage.getItem("uid"));
+    div.appendChild(input);
+
+    for(var i = 0; i < src_counter; i++)
+    {
+        // creating checkbox element
+        var checkbox = document.createElement('input');
+
+        // Assigning the attributes
+        // to created checkbox
+        checkbox.type = "checkbox";
+        checkbox.name = 'boxes';
+        checkbox.value = localStorage.getItem("panel_id".concat(i));
+        checkbox.id = i;
+
+        // creating label for checkbox
+        var label = document.createElement('label');
+
+        // assigning attributes for
+        // the created label tag
+        label.htmlFor = i;
+
+        // appending the created text to
+        // the created label tag
+        label.appendChild(document.createTextNode(localStorage.getItem("panel_name".concat(i))));
+
+        // appending the checkbox
+        // and label to div
+        div.appendChild(checkbox);
+        div.appendChild(label);
+    }
+</script>
+</html>

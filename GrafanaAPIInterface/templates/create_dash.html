@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/create_dash_style.css') }}">
+    <title>Grafana API Interface</title>
+    <link rel="icon" href="{{ logo }}">
+
+</head>
+<body>
+<div class="navbar">
+  <a href="home">Home</a>
+  <a href="create_dash">Create Dash</a>
+  <a href="delete_dash">Delete Dash</a>
+  <a href="temp_graphs">Temp Graphs</a>
+</div>
+    <h1>Add New Dashboard</h1>
+    <form method="POST">
+        <input type="text" name="dash_name" placeholder="Dashboard Title"><br>
+        <input type="text" id="graph_name" name="graph_name" placeholder="Graph Title"><br>
+        <input type="text" id="search_key" name="search_key" placeholder="Search Key">
+        {{form.csrf_token}}
+        {{form.table}}
+        <input type="submit"/>
+        <input type="reset" value="Reset" />
+
+        <div id = "div0"></div>
+        <div id = "div1"></div>
+        <div id = "div2"></div>
+        <div id = "div3"></div>
+        <div id = "div4"></div>
+        <div id = "div5"></div>
+        <div id = "div6"></div>
+        <div id = "div7"></div>
+        <div id = "div8"></div>
+        <div id = "div9"></div>
+    </form>
+
+
+    <script>
+        let table_select = document.getElementById('table');
+        let search = document.getElementById('search_key');
+        let top_div = document.getElementById('div0');
+        let divs = [];
+
+        let option_values = [];
+        let option_text = [];
+
+        for(var i = 0; i < table_select.length; i++)
+        {
+            option_values.push(table_select.options[i].value);
+            option_text.push(table_select.options[i].text);
+        }
+
+        for (var i = table_select.length-1; i >= 0; i--) {
+                table_select.options[i] = null;
+        }
+
+        for(let i = 1; i < 10; i++)
+        {
+            divs.push(document.getElementById('div'.concat(String(i))));
+        }
+
+        $('#search_key').bind('input', function() {
+            for (var i = table_select.length-1; i >= 0; i--) {
+                table_select.options[i] = null;
+            }
+
+            for(i = 0; i < option_values.length && i < 20; i++)
+            {
+                if(option_text[i].search(search.value) != -1)
+                {
+                    var new_option = document.createElement('option');
+                    new_option.text = option_text[i];
+                    new_option.value = option_values[i];
+                    table_select.add(new_option, 0);
+                }
+            }
+            table_select.value = null;
+        });
+
+         table_select.onchange = function() {
+            table = table_select.value;
+            var title = document.createElement("Label");
+
+            holder_div = document.createElement("div");
+            top_div.append(holder_div);
+
+            title.innerHTML = String(table_select.options[table_select.selectedIndex].text);
+            holder_div.appendChild(title);
+            create_checkboxes(table, holder_div)
+            linebreak = document.createElement("br");
+            top_div.appendChild(top_div);
+
+        };
+
+        function create_checkboxes(table, target_loc) {
+            fetch('/col/' + table).then(function(response) {
+                response.json().then(function(data) {
+                    for (let col of data.col) {
+                        if(col.col == "time") {
+                            continue;}
+                        // creating checkbox element
+                        var checkbox = document.createElement('input');
+
+                        // Assigning the attributes
+                        // to created checkbox
+                        checkbox.type = "checkbox";
+                        checkbox.value = String(table).concat(col.col);
+                        checkbox.name = 'boxes';
+
+                        // creating label for checkbox
+                        var label = document.createElement('label');
+                        label.name = 'boxes_label';
+                        label.innerHTML = col.col;
+
+                        // appending the checkbox
+                        // and label to div
+                        target_loc.appendChild(checkbox);
+                        target_loc.appendChild(label);
+                    }
+
+                });
+            });
+
+        };
+    </script>
+
+</body>
+</html>

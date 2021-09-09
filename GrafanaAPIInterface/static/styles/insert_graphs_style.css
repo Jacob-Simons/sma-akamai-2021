@@ -1,0 +1,97 @@
+:root {
+  --main-bg-color: #c9c9c9;
+}
+$main-color:
+$secondary-color: white;
+$main-color: #333;
+$secondary-color: #2196f3;
+$width: 550px; // Change Me
+
+* {
+  box-sizing: border-box;
+}
+
+input[type='text']::-webkit-input-placeholder {
+    font-family: "Roboto", Times, serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+body {
+    background: var(--main-bg-color);
+    padding-top: 20px;
+}
+
+select {
+  background-color: var(---main-bg-color);
+  font: Roboto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 6px 12px;
+}
+
+div.navbar {
+    background-color: #6495ED;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    font: Roboto;
+}
+
+// Stop Chrome's hideous pale yellow background on auto-fill
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px $main-color inset;
+    -webkit-text-fill-color: white !important;
+    // border-bottom-color: rgba(white, .5);
+  }
+}
+
+::selection {background: rgba($secondary-color, .3);}
+
+input[type="submit"]{
+ display:inline-block;
+ padding:0.35em 1.2em;
+ //border:0.1em solid #FFFFFF;
+ margin:0 0.3em 0.3em 0;
+ border-radius:0.12em;
+ box-sizing: border-box;
+ text-decoration:none;
+ font-family:'Roboto',sans-serif;
+ font-weight:300;
+ color:#000000;
+ background-color:#b0aeae;
+ text-align:center;
+ transition: all 0.2s;
+}
+
+input[type="submit"]:hover{
+ color:#000000;
+ background-color: white;
+}
+
+@media all and (max-width:30em){
+input[type="submit"]{
+  display:block;
+  margin:0.4em auto;
+}
+}
+
+label{
+    display: inline-block;
+    font: Roboto;
+    font-weight: 2px;
+}
+
+.h2 {
+    font-weight: 3px;
+}
+
+a {
+    font: Roboto;
+    font-size: 20px;
+    font-weight: bold;
+    padding-right: 10px;
+    padding-left: 15px;
+}
+
